@@ -25,22 +25,22 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
     };
   });
 
-  const customTooltip = ({ active, payload, label }: any) => {
+  const customTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload as EnrichedWeatherRecord & { timeLabel: string };
       return (
-        <div className="bg-slate-950 border border-slate-700 p-2.5 rounded shadow-xl text-xs font-mono">
-          <div className="text-slate-400 font-semibold mb-1 border-b border-slate-800 pb-1">
-            {data.timestamp}
+        <div className="bg-white border border-slate-200 p-3 rounded-lg shadow-md text-xs">
+          <div className="text-slate-500 font-semibold mb-1.5 border-b border-slate-100 pb-1">
+            Time: {data.timestamp}
           </div>
-          <div className="space-y-0.5">
-            <div className="text-orange-400">Temp: {data.temperature.toFixed(1)} °C</div>
-            <div className="text-cyan-400">Humidity: {data.humidity.toFixed(0)} %</div>
-            <div className="text-purple-400">Pressure: {data.pressure.toFixed(1)} hPa</div>
-            <div className="text-emerald-400">Wind: {data.wind_speed.toFixed(1)} m/s</div>
+          <div className="space-y-1">
+            <div className="text-rose-600 font-medium">Temperature: <span className="font-bold">{data.temperature.toFixed(1)} °C</span></div>
+            <div className="text-sky-600 font-medium">Humidity: <span className="font-bold">{data.humidity.toFixed(0)} %</span></div>
+            <div className="text-emerald-700 font-medium">Air Pressure: <span className="font-bold">{data.pressure.toFixed(1)} hPa</span></div>
+            <div className="text-purple-600 font-medium">Wind Speed: <span className="font-bold">{data.wind_speed.toFixed(1)} m/s</span></div>
             {data.anomaly && (
-              <div className="text-rose-400 font-bold mt-1 pt-1 border-t border-slate-800">
-                ⚠ {data.anomaly_type.toUpperCase()} ({data.severity})
+              <div className="text-rose-800 font-bold mt-1.5 pt-1.5 border-t border-slate-100 bg-rose-50 px-2 py-1 rounded">
+                ⚠ Unusual reading ({data.severity || "Flagged"})
               </div>
             )}
           </div>
@@ -58,9 +58,9 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
           key={`dot-${payload.timestamp}`}
           cx={cx}
           cy={cy}
-          r={5}
-          fill="#f43f5e"
-          stroke="#ffe4e6"
+          r={5.5}
+          fill="#dc2626"
+          stroke="#ffffff"
           strokeWidth={2}
           className="animate-pulse"
         />
@@ -71,39 +71,42 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
         key={`dot-${payload.timestamp}`}
         cx={cx}
         cy={cy}
-        r={2.5}
+        r={3}
         fill={color}
-        stroke="#0f172a"
-        strokeWidth={1}
+        stroke="#ffffff"
+        strokeWidth={1.5}
       />
     );
   };
 
   return (
     <section id="charts-grid-section" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      {/* 1. Temperature vs Time */}
-      <div id="chart-card-temperature" className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+      {/* 1. Temperature vs Time - Vibrant Crimson Red */}
+      <div id="chart-card-temperature" className="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-            Temperature vs Time
-          </h3>
-          <span className="text-[11px] font-mono text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">
-            Metric: °C
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              Temperature Trend
+            </h3>
+            <p className="text-xs text-slate-500">Air temperature recordings over time</p>
+          </div>
+          <span className="text-xs font-semibold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">
+            °C (Celsius)
           </span>
         </div>
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="timeLabel" stroke="#64748b" tick={{ fontSize: 10, fill: "#64748b" }} />
-              <YAxis stroke="#64748b" domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "#64748b" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="timeLabel" stroke="#94a3b8" tick={{ fontSize: 11, fill: "#475569" }} />
+              <YAxis stroke="#94a3b8" domain={["auto", "auto"]} tick={{ fontSize: 11, fill: "#475569" }} />
               <Tooltip content={customTooltip} />
               <Line
                 type="monotone"
                 dataKey="temperature"
-                stroke="#f97316"
-                strokeWidth={2}
-                dot={renderDot("#f97316")}
+                stroke="#e11d48"
+                strokeWidth={2.5}
+                dot={renderDot("#e11d48")}
                 isAnimationActive={false}
               />
             </LineChart>
@@ -111,29 +114,32 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
         </div>
       </div>
 
-      {/* 2. Humidity vs Time */}
-      <div id="chart-card-humidity" className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+      {/* 2. Humidity vs Time - Vibrant Ocean Cerulean Blue */}
+      <div id="chart-card-humidity" className="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-            Humidity vs Time
-          </h3>
-          <span className="text-[11px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
-            Metric: % RH
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              Humidity Trend
+            </h3>
+            <p className="text-xs text-slate-500">Air moisture level percentage</p>
+          </div>
+          <span className="text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-200">
+            % (Moisture)
           </span>
         </div>
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="timeLabel" stroke="#64748b" tick={{ fontSize: 10, fill: "#64748b" }} />
-              <YAxis stroke="#64748b" domain={[0, 100]} tick={{ fontSize: 10, fill: "#64748b" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="timeLabel" stroke="#94a3b8" tick={{ fontSize: 11, fill: "#475569" }} />
+              <YAxis stroke="#94a3b8" domain={[0, 100]} tick={{ fontSize: 11, fill: "#475569" }} />
               <Tooltip content={customTooltip} />
               <Line
                 type="monotone"
                 dataKey="humidity"
-                stroke="#06b6d4"
-                strokeWidth={2}
-                dot={renderDot("#06b6d4")}
+                stroke="#0284c7"
+                strokeWidth={2.5}
+                dot={renderDot("#0284c7")}
                 isAnimationActive={false}
               />
             </LineChart>
@@ -141,29 +147,32 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
         </div>
       </div>
 
-      {/* 3. Barometric Pressure vs Time */}
-      <div id="chart-card-pressure" className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+      {/* 3. Barometric Pressure vs Time - Forest Emerald Green */}
+      <div id="chart-card-pressure" className="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-            Pressure vs Time
-          </h3>
-          <span className="text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-            Metric: hPa
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              Air Pressure Trend
+            </h3>
+            <p className="text-xs text-slate-500">Barometric atmospheric pressure</p>
+          </div>
+          <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+            hPa (Pressure)
           </span>
         </div>
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="timeLabel" stroke="#64748b" tick={{ fontSize: 10, fill: "#64748b" }} />
-              <YAxis stroke="#64748b" domain={["auto", "auto"]} tick={{ fontSize: 10, fill: "#64748b" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="timeLabel" stroke="#94a3b8" tick={{ fontSize: 11, fill: "#475569" }} />
+              <YAxis stroke="#94a3b8" domain={["auto", "auto"]} tick={{ fontSize: 11, fill: "#475569" }} />
               <Tooltip content={customTooltip} />
               <Line
                 type="monotone"
                 dataKey="pressure"
-                stroke="#a855f7"
-                strokeWidth={2}
-                dot={renderDot("#a855f7")}
+                stroke="#059669"
+                strokeWidth={2.5}
+                dot={renderDot("#059669")}
                 isAnimationActive={false}
               />
             </LineChart>
@@ -171,29 +180,32 @@ export const TelemetryCharts: React.FC<TelemetryChartsProps> = ({ history }) => 
         </div>
       </div>
 
-      {/* 4. Wind Speed vs Time */}
-      <div id="chart-card-wind" className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+      {/* 4. Wind Speed vs Time - Vibrant Royal Purple */}
+      <div id="chart-card-wind" className="bg-white border border-slate-200 rounded-xl p-4.5 shadow-xs">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-            Wind Speed vs Time
-          </h3>
-          <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-            Metric: m/s
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">
+              Wind Speed Trend
+            </h3>
+            <p className="text-xs text-slate-500">Wind velocity measurements</p>
+          </div>
+          <span className="text-xs font-semibold text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200">
+            m/s (Meters / Sec)
           </span>
         </div>
         <div className="h-52 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="timeLabel" stroke="#64748b" tick={{ fontSize: 10, fill: "#64748b" }} />
-              <YAxis stroke="#64748b" domain={[0, "auto"]} tick={{ fontSize: 10, fill: "#64748b" }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="timeLabel" stroke="#94a3b8" tick={{ fontSize: 11, fill: "#475569" }} />
+              <YAxis stroke="#94a3b8" domain={[0, "auto"]} tick={{ fontSize: 11, fill: "#475569" }} />
               <Tooltip content={customTooltip} />
               <Line
                 type="monotone"
                 dataKey="wind_speed"
-                stroke="#10b981"
-                strokeWidth={2}
-                dot={renderDot("#10b981")}
+                stroke="#7c3aed"
+                strokeWidth={2.5}
+                dot={renderDot("#7c3aed")}
                 isAnimationActive={false}
               />
             </LineChart>

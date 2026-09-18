@@ -111,27 +111,27 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
   return (
     <div
       id="station-config-modal-backdrop"
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
     >
       <div
         id="station-config-dialog"
-        className="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full shadow-2xl overflow-hidden"
+        className="bg-white border border-slate-200 rounded-xl max-w-lg w-full shadow-2xl overflow-hidden text-slate-900"
       >
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Settings className="w-5 h-5 text-blue-400" />
+            <Settings className="w-5 h-5 text-blue-600" />
             <div>
-              <h2 className="text-base font-mono font-bold text-white uppercase">
-                Station & OpenWeather Config
+              <h2 className="text-base font-bold text-slate-900">
+                Weather Station Settings
               </h2>
-              <p className="text-xs text-slate-400">
-                Configure live API integration and Automatic Weather Station coordinates
+              <p className="text-xs text-slate-500">
+                Set your weather location, API key, and check interval
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -139,7 +139,7 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {message && (
-            <div className="p-3 bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs rounded-lg font-mono">
+            <div className="p-3 bg-blue-50 border border-blue-200 text-blue-800 text-xs rounded-lg font-medium">
               {message}
             </div>
           )}
@@ -147,16 +147,16 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
           {/* OpenWeather API Key */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-blue-400" />
-                <span>OpenWeather API Key:</span>
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-blue-600" />
+                <span>OpenWeather API Key (Optional):</span>
               </label>
               {status?.api_has_key && (
                 <button
                   type="button"
                   onClick={handleClearKey}
                   disabled={isSaving}
-                  className="text-[11px] font-mono text-slate-400 hover:text-rose-400 transition underline cursor-pointer"
+                  className="text-xs text-slate-500 hover:text-rose-600 transition underline cursor-pointer"
                 >
                   Clear Key
                 </button>
@@ -172,16 +172,16 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
                 }}
                 placeholder={
                   status?.api_has_key
-                    ? `Current Key: ${status.api_key_masked || "Configured"} (paste new key to update)`
-                    : "Paste 32-character key (optional, leave blank to use baseline)"
+                    ? `Current Key: ${status.api_key_masked || "Configured"} (paste new key to change)`
+                    : "Paste OpenWeather key here (leave blank for built-in weather data)"
                 }
-                className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="flex-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               />
               <button
                 type="button"
                 onClick={handleTestKey}
                 disabled={isTesting}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-mono font-medium transition whitespace-nowrap cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-lg text-xs font-semibold transition whitespace-nowrap cursor-pointer disabled:opacity-50"
               >
                 {isTesting ? "Testing..." : "Test Key"}
               </button>
@@ -190,32 +190,31 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
             {/* Test Result Feedback */}
             {testResult && (
               <div
-                className={`mt-2 p-2.5 rounded text-xs font-mono border ${
+                className={`mt-2 p-3 rounded-lg text-xs border ${
                   testResult.valid
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                    ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                     : testResult.status === 401
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                    : "bg-rose-500/10 border-rose-500/30 text-rose-300"
+                    ? "bg-amber-50 border-amber-200 text-amber-800"
+                    : "bg-rose-50 border-rose-200 text-rose-800"
                 }`}
               >
-                <div className="font-semibold flex items-center gap-1.5">
-                  <span>Status: HTTP {testResult.status}</span>
-                  <span>{testResult.valid ? "• Live & Operational" : "• Activation Notice"}</span>
+                <div className="font-bold flex items-center gap-1.5">
+                  <span>Status: {testResult.valid ? "Connected successfully" : "Needs attention"}</span>
                 </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-slate-300">{testResult.message}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-700">{testResult.message}</p>
               </div>
             )}
 
-            <div className="mt-1.5 text-[11px] text-slate-400 flex items-center justify-between">
+            <div className="mt-1.5 text-xs text-slate-500 flex items-center justify-between">
               <span>
-                Current Feed:{" "}
+                Current data source:{" "}
                 <strong
                   className={
                     status?.api_connected
-                      ? "text-emerald-400"
+                      ? "text-emerald-700 font-bold"
                       : status?.api_status_code === 401
-                      ? "text-amber-400"
-                      : "text-blue-400"
+                      ? "text-amber-700 font-bold"
+                      : "text-blue-700 font-bold"
                   }
                 >
                   {status?.api_status_text}
@@ -224,10 +223,10 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
             </div>
 
             {status?.api_status_code === 401 && !testResult && (
-              <div className="mt-2 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded text-amber-200 text-[11px] font-mono leading-relaxed">
-                <span className="font-bold text-amber-300">OpenWeather Notice: </span>
-                New OpenWeather API keys take 10–60 minutes (up to 2 hours) to propagate across OpenWeather's API gateways.
-                WeatherGuard AI automatically generates and logs continuous high-fidelity AWS observations so the dashboard, charts, and Isolation Forest ML detection run uninterrupted.
+              <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-xs leading-relaxed">
+                <span className="font-bold text-amber-800">Note about new OpenWeather keys: </span>
+                New API keys can take from 15 minutes to 2 hours to activate on OpenWeather servers.
+                In the meantime, the app automatically creates and saves realistic weather data so all charts and anomaly detection work seamlessly.
               </div>
             )}
           </div>
@@ -235,8 +234,8 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
           {/* Coordinates */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5 mb-1.5">
-                <Globe className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                <Globe className="w-3.5 h-3.5 text-slate-500" />
                 <span>Station Latitude:</span>
               </label>
               <input
@@ -244,13 +243,13 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
                 step="any"
                 value={latitude}
                 onChange={(e) => setLatitude(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
                 required
               />
             </div>
             <div>
-              <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5 mb-1.5">
-                <Globe className="w-3.5 h-3.5 text-slate-400" />
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                <Globe className="w-3.5 h-3.5 text-slate-500" />
                 <span>Station Longitude:</span>
               </label>
               <input
@@ -258,7 +257,7 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
                 step="any"
                 value={longitude}
                 onChange={(e) => setLongitude(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
                 required
               />
             </div>
@@ -266,9 +265,9 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
 
           {/* Collection Interval */}
           <div>
-            <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5 mb-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Collection Interval (Seconds):</span>
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <span>How often to check (in Seconds):</span>
             </label>
             <input
               type="number"
@@ -276,39 +275,39 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
               max="3600"
               value={intervalSec}
               onChange={(e) => setIntervalSec(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-semibold"
               required
             />
-            <p className="text-[11px] text-slate-500 mt-1">Default is 60s as specified in deliverables</p>
+            <p className="text-xs text-slate-500 mt-1">Default is every 60 seconds</p>
           </div>
 
           {/* Reset button */}
-          <div className="pt-2 border-t border-slate-800 flex justify-between items-center">
+          <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
             <button
               type="button"
               onClick={handleReset}
               disabled={isResetting}
-              className="text-xs text-rose-400 hover:text-rose-300 font-mono flex items-center gap-1 cursor-pointer transition disabled:opacity-50"
+              className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 cursor-pointer transition disabled:opacity-50"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>{isResetting ? "Resetting..." : "Reset Baseline CSV"}</span>
+              <span>{isResetting ? "Resetting..." : "Reset Weather Data File"}</span>
             </button>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition cursor-pointer"
+                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow"
+                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Check className="w-3.5 h-3.5" />
-                <span>{isSaving ? "Saving..." : "Save Config"}</span>
+                <span>{isSaving ? "Saving..." : "Save Settings"}</span>
               </button>
             </div>
           </div>

@@ -21,45 +21,45 @@ export const SimulateAnomalyModal: React.FC<SimulateAnomalyModalProps> = ({
   const presets = [
     {
       id: "heat_spike",
-      name: "Extreme Temperature Spike (48.2 °C)",
-      desc: "Simulates sudden thermocouple anomaly exceeding diurnal envelope",
+      name: "Extreme Heat Wave (48.2 °C)",
+      desc: "Simulates sudden intense heat wave or overheating sensor",
       defaultValue: "48.2",
-      type: "temperature anomaly",
+      type: "High Temperature",
     },
     {
       id: "pressure_drop",
-      name: "Rapid Barometric Drop (962.4 hPa)",
-      desc: "Simulates cyclonic pressure drop or piezoresistive transducer drift",
+      name: "Sudden Air Pressure Drop (962.4 hPa)",
+      desc: "Simulates sudden storm pressure drop or barometer fault",
       defaultValue: "962.4",
-      type: "pressure anomaly",
+      type: "Low Pressure",
     },
     {
       id: "humidity_plunge",
-      name: "Humidity Plunge (8.0 %)",
-      desc: "Simulates abrupt psychrometer capacitance failure",
+      name: "Extremely Low Humidity (8.0 %)",
+      desc: "Simulates extreme dry air or humidity sensor fault",
       defaultValue: "8.0",
-      type: "humidity anomaly",
+      type: "Low Moisture",
     },
     {
       id: "wind_surge",
-      name: "Sudden Wind Surge (28.4 m/s)",
-      desc: "Simulates intense gust squall outside baseline anemometer distribution",
+      name: "Sudden Strong Wind Gust (28.4 m/s)",
+      desc: "Simulates sudden severe wind gust or storm wind",
       defaultValue: "28.4",
-      type: "wind anomaly",
+      type: "High Wind",
     },
     {
       id: "rain_burst",
-      name: "Torrential Rain Burst (42.5 mm)",
-      desc: "Simulates rapid tipping-bucket accumulation",
+      name: "Heavy Rain Burst (42.5 mm)",
+      desc: "Simulates sudden extreme rainfall accumulation",
       defaultValue: "42.5",
-      type: "rainfall anomaly",
+      type: "High Rainfall",
     },
     {
       id: "sensor_freeze",
-      name: "Transducer Freeze / Malfunction (0.0)",
-      desc: "Simulates stuck or disconnected sensor transmitting unvarying zero reading",
+      name: "Sensor Glitch / Offline (0.0)",
+      desc: "Simulates a sensor that lost connection or got stuck at zero",
       defaultValue: "0.0",
-      type: "sensor anomaly",
+      type: "Sensor Error",
     },
   ];
 
@@ -84,28 +84,28 @@ export const SimulateAnomalyModal: React.FC<SimulateAnomalyModalProps> = ({
   return (
     <div
       id="simulate-anomaly-modal-backdrop"
-      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4"
     >
       <div
         id="simulate-anomaly-dialog"
-        className="bg-slate-900 border border-slate-700 rounded-xl max-w-lg w-full shadow-2xl overflow-hidden"
+        className="bg-white border border-slate-200 rounded-xl max-w-lg w-full shadow-2xl overflow-hidden text-slate-900"
       >
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
             <div>
-              <h2 className="text-base font-mono font-bold text-white uppercase">
-                Inject Synthetic Anomaly
+              <h2 className="text-base font-bold text-slate-900">
+                Test Anomaly Detection
               </h2>
-              <p className="text-xs text-slate-400">
-                Test and benchmark Isolation Forest detection & attribution live
+              <p className="text-xs text-slate-500">
+                Send a sample unusual weather event to test how the AI responds
               </p>
             </div>
           </div>
           <button
             id="btn-close-simulate-modal"
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -113,8 +113,8 @@ export const SimulateAnomalyModal: React.FC<SimulateAnomalyModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-5 space-y-4">
           <div>
-            <label className="text-xs font-mono font-semibold text-slate-300 uppercase block mb-2">
-              Select Anomaly Scenario:
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">
+              Choose Test Scenario:
             </label>
             <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
               {presets.map((preset) => (
@@ -123,52 +123,52 @@ export const SimulateAnomalyModal: React.FC<SimulateAnomalyModalProps> = ({
                   onClick={() => handleSelectPreset(preset)}
                   className={`p-3 rounded-lg border text-xs cursor-pointer transition ${
                     selectedType === preset.id
-                      ? "bg-amber-500/10 border-amber-500/50 text-white"
-                      : "bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700"
+                      ? "bg-amber-50 border-amber-400 text-slate-900 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300"
                   }`}
                 >
-                  <div className="flex items-center justify-between font-semibold">
-                    <span>{preset.name}</span>
-                    <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="text-slate-900">{preset.name}</span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
                       {preset.type}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1 font-sans">{preset.desc}</p>
+                  <p className="text-xs text-slate-500 mt-1 font-normal">{preset.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-mono font-semibold text-slate-300 uppercase block mb-1.5">
-              Parameter Value:
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
+              Test Value:
             </label>
             <input
               type="number"
               step="any"
               value={customVal}
               onChange={(e) => setCustomVal(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-sm font-mono text-white focus:outline-none focus:border-amber-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-semibold"
               placeholder="e.g. 48.2"
               required
             />
           </div>
 
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition"
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow"
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-lg transition flex items-center gap-1.5 shadow-xs"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{isLoading ? "Injecting..." : "Inject & Evaluate"}</span>
+              <span>{isLoading ? "Sending..." : "Send Test Reading"}</span>
             </button>
           </div>
         </form>

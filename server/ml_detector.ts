@@ -213,10 +213,10 @@ export class IsolationForestDetector {
           anomaly_score: parseFloat(score.toFixed(3)),
           severity: "NORMAL" as SeverityLevel,
           anomaly_type: "none" as AnomalyCategory,
-          parameter: "None",
+          parameter: "All Sensors Normal",
           current_value: `${record.temperature.toFixed(1)} °C`,
-          expected_pattern: "Nominal operational limits",
-          anomaly_reason: "All AWS telemetry parameters within nominal operational limits.",
+          expected_pattern: "Normal expected weather range",
+          anomaly_reason: "All weather readings are completely normal and within healthy limits.",
         };
       }
 
@@ -310,47 +310,47 @@ export class IsolationForestDetector {
       anomaly_type = "sudden change";
       parameter = suddenParam.replace("_", " ").toUpperCase();
       current_value = `${record[suddenParam]}`;
-      anomaly_reason = `${parameter} changed abruptly (+/- ${deltaVal.toFixed(1)}) compared with recent observations.`;
+      anomaly_reason = `${parameter} jumped suddenly by ${deltaVal.toFixed(1)} compared to earlier readings today.`;
     } else if (highDeviations.length >= 2) {
       anomaly_type = "multiple sensor anomaly";
       parameter = "Multiple Sensors";
       const names = highDeviations.map(([p]) => p.replace("_", " "));
-      anomaly_reason = `Simultaneous multi-parameter deviation across ${names.join(", ")}.`;
+      anomaly_reason = `Several weather readings changed unexpectedly at once: ${names.join(", ")}.`;
       current_value = highDeviations.map(([p]) => `${p}: ${record[p as FeatureName]}`).join(" | ");
     } else if (topFeature === "temperature") {
       anomaly_type = "temperature anomaly";
       parameter = "Temperature";
       current_value = `${currVal.toFixed(1)} °C`;
-      expected_pattern = `Expected ~ ${meanVal.toFixed(1)} °C`;
-      anomaly_reason = `Temperature changed significantly (${currVal.toFixed(1)} °C vs expected ${meanVal.toFixed(1)} °C) compared with recent observations.`;
+      expected_pattern = `Usually around ${meanVal.toFixed(1)} °C`;
+      anomaly_reason = `Temperature changed a lot (${currVal.toFixed(1)} °C vs usual ${meanVal.toFixed(1)} °C) compared to recent hours.`;
     } else if (topFeature === "humidity") {
       anomaly_type = "humidity anomaly";
       parameter = "Humidity";
       current_value = `${currVal.toFixed(0)} %`;
-      expected_pattern = `Expected ~ ${meanVal.toFixed(0)} %`;
-      anomaly_reason = `Relative humidity reading (${currVal.toFixed(0)}%) exhibits sharp departure from ambient baseline.`;
+      expected_pattern = `Usually around ${meanVal.toFixed(0)} %`;
+      anomaly_reason = `Humidity is unusually high or low (${currVal.toFixed(0)}%) compared to normal levels today.`;
     } else if (topFeature === "pressure") {
       anomaly_type = "pressure anomaly";
-      parameter = "Barometric Pressure";
+      parameter = "Air Pressure";
       current_value = `${currVal.toFixed(1)} hPa`;
-      expected_pattern = `Expected ~ ${meanVal.toFixed(1)} hPa`;
-      anomaly_reason = `Barometric pressure reading (${currVal.toFixed(1)} hPa) diverged from ambient atmospheric baseline.`;
+      expected_pattern = `Usually around ${meanVal.toFixed(1)} hPa`;
+      anomaly_reason = `Air pressure changed unexpectedly to ${currVal.toFixed(1)} hPa (usually around ${meanVal.toFixed(1)} hPa).`;
     } else if (topFeature === "wind_speed") {
       anomaly_type = "wind anomaly";
       parameter = "Wind Speed";
       current_value = `${currVal.toFixed(1)} m/s`;
-      expected_pattern = `Expected ~ ${meanVal.toFixed(1)} m/s`;
-      anomaly_reason = `Wind speed spike detected (${currVal.toFixed(1)} m/s) outside station nominal operating range.`;
+      expected_pattern = `Usually around ${meanVal.toFixed(1)} m/s`;
+      anomaly_reason = `Strong sudden wind speed spike detected at ${currVal.toFixed(1)} m/s.`;
     } else if (topFeature === "rainfall") {
       anomaly_type = "rainfall anomaly";
       parameter = "Rainfall";
       current_value = `${currVal.toFixed(1)} mm`;
-      expected_pattern = `Expected ~ ${meanVal.toFixed(1)} mm`;
-      anomaly_reason = `Precipitation sensor logged rapid rain accumulation (${currVal.toFixed(1)} mm) in short observation window.`;
+      expected_pattern = `Usually around ${meanVal.toFixed(1)} mm`;
+      anomaly_reason = `Sudden heavy rain burst recorded (${currVal.toFixed(1)} mm) in a very short time.`;
     } else {
       anomaly_type = "sensor anomaly";
       parameter = topParam.replace("_", " ").toUpperCase();
-      anomaly_reason = `Sensor ${parameter} reading exhibits anomalous statistical distance from baseline.`;
+      anomaly_reason = `The ${parameter} sensor reading is unusually far outside its normal daily pattern.`;
     }
 
     // Severity determination
@@ -385,13 +385,13 @@ export class IsolationForestDetector {
    */
   calculateSensorHealth(dataset: WeatherRecord[]): SensorHealthResponse {
     const defaultResponse: SensorHealthResponse = {
-      disclaimer: "Analytical indicator and not a physical inspection of the sensors.",
+      disclaimer: "Estimated score based on data patterns, not a physical hardware inspection.",
       metrics: {
-        temperature: { col: "temperature", unit: "°C", score: 96, status: "Healthy", note: "Thermal curve nominal" },
-        humidity: { col: "humidity", unit: "%", score: 94, status: "Healthy", note: "Psychrometric delta stable" },
-        pressure: { col: "pressure", unit: "hPa", score: 98, status: "Healthy", note: "Barometric gradient stable" },
-        wind: { col: "wind_speed", unit: "m/s", score: 92, status: "Healthy", note: "Anemometer rotation normal" },
-        rainfall: { col: "rainfall", unit: "mm", score: 99, status: "Healthy", note: "Pluviometer bucket clear" },
+        temperature: { col: "temperature", unit: "°C", score: 96, status: "Healthy", note: "Normal temperature readings" },
+        humidity: { col: "humidity", unit: "%", score: 94, status: "Healthy", note: "Normal humidity readings" },
+        pressure: { col: "pressure", unit: "hPa", score: 98, status: "Healthy", note: "Air pressure is steady" },
+        wind: { col: "wind_speed", unit: "m/s", score: 92, status: "Healthy", note: "Wind sensor working well" },
+        rainfall: { col: "rainfall", unit: "mm", score: 99, status: "Healthy", note: "Rain sensor clear" },
       },
     };
 
@@ -418,12 +418,12 @@ export class IsolationForestDetector {
       const lastVal = vals[vals.length - 1];
 
       let score = 100;
-      let note = "Nominal performance";
+      let note = "Working normally";
 
       // 1. Stuck sensor check (zero variance over >= 6 observations, except rainfall)
       if (recent.length >= 6 && std === 0 && item.key !== "rainfall") {
         score -= 32;
-        note = "Possible stuck/frozen transducer reading";
+        note = "Sensor may be stuck on same number";
       }
 
       // 2. High variance or sudden delta check
@@ -431,31 +431,31 @@ export class IsolationForestDetector {
         const delta = Math.abs(vals[vals.length - 1] - vals[vals.length - 2]);
         if (item.key === "temperature" && delta > 4.5) {
           score -= 30;
-          note = "Sudden thermal flux observed";
+          note = "Temperature changed very quickly";
         } else if (item.key === "pressure" && delta > 8.0) {
           score -= 32;
-          note = "Barometric pressure gradient anomaly";
+          note = "Unusual air pressure shift";
         } else if (item.key === "humidity" && delta > 25.0) {
           score -= 28;
-          note = "Abrupt RH jump observed";
+          note = "Sudden humidity change";
         } else if (item.key === "wind" && delta > 14.0) {
           score -= 25;
-          note = "Turbulent wind gust detected";
+          note = "Strong sudden wind gust";
         }
       }
 
       // 3. Absolute physical boundaries
       if (item.key === "temperature" && (lastVal < -30 || lastVal > 55)) {
         score -= 40;
-        note = "Measurement near physical limits";
+        note = "Near extreme temperature limits";
       }
       if (item.key === "humidity" && (lastVal <= 0 || lastVal > 100)) {
         score -= 35;
-        note = "Out-of-range sensor saturation";
+        note = "Reading outside valid range (0-100%)";
       }
       if (item.key === "pressure" && (lastVal < 860 || lastVal > 1080)) {
         score -= 40;
-        note = "Extreme barometric excursion";
+        note = "Air pressure reading is abnormally high/low";
       }
 
       // Clamped score
@@ -477,7 +477,7 @@ export class IsolationForestDetector {
     }
 
     return {
-      disclaimer: "Analytical indicator and not a physical inspection of the sensors.",
+      disclaimer: "Estimated score based on data patterns, not a physical hardware inspection.",
       metrics,
     };
   }

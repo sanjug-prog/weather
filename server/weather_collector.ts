@@ -264,7 +264,7 @@ export async function fetchLiveWeatherFromApi(): Promise<{
   if (!hasKey) {
     apiConnectionState.connected = false;
     apiConnectionState.statusCode = null;
-    apiConnectionState.statusText = "Baseline Generator Active (Awaiting Key)";
+    apiConnectionState.statusText = "Using Simulated Weather (No API Key)";
     apiConnectionState.activationNotice = undefined;
 
     const simulated = generateRealisticAwsObservation(latitude, longitude);
@@ -273,7 +273,7 @@ export async function fetchLiveWeatherFromApi(): Promise<{
       success: true,
       record: simulated,
       isSimulatedFallback: true,
-      message: "Generated realistic AWS telemetry baseline (OpenWeather API key pending).",
+      message: "Generated realistic weather (OpenWeather key not set).",
     };
   }
 
@@ -289,7 +289,7 @@ export async function fetchLiveWeatherFromApi(): Promise<{
       const data = await res.json();
       apiConnectionState.connected = true;
       apiConnectionState.statusCode = 200;
-      apiConnectionState.statusText = "Connected (OpenWeather Live 200 OK)";
+      apiConnectionState.statusText = "Connected to Live OpenWeather";
       apiConnectionState.activationNotice = undefined;
 
       const rain1h = data.rain ? (data.rain["1h"] || data.rain["3h"] || 0.0) : 0.0;
@@ -319,7 +319,7 @@ export async function fetchLiveWeatherFromApi(): Promise<{
         success: true,
         record,
         isSimulatedFallback: false,
-        message: "Live OpenWeather AWS observation ingested successfully.",
+        message: "Live weather updated successfully.",
       };
     }
 
@@ -329,21 +329,21 @@ export async function fetchLiveWeatherFromApi(): Promise<{
 
     let notice = "";
     if (res.status === 401) {
-      notice = "OpenWeather API Key (HTTP 401: Key pending activation or invalid).";
-      apiConnectionState.statusText = "Key Activating / Inactive (HTTP 401) • AWS Telemetry Active";
+      notice = "OpenWeather Key is still activating (HTTP 401).";
+      apiConnectionState.statusText = "Key Activating (401) • Using Backup Weather";
       apiConnectionState.activationNotice =
-        "OpenWeather API key returned HTTP 401. New OpenWeather keys take 10-60 min to activate across servers. Continuous AWS baseline telemetry is active.";
+        "New OpenWeather keys take 10-60 minutes to activate on their servers. Meanwhile, simulated weather is active so everything works normally.";
       console.log(
         `[WeatherGuard Telemetry] Key ${apiConnectionState.keyMasked} returned HTTP 401 (activation delay). Operating seamlessly on realistic AWS baseline telemetry.`
       );
     } else if (res.status === 429) {
-      notice = "OpenWeather rate limit exceeded (HTTP 429).";
-      apiConnectionState.statusText = "Rate Limited (HTTP 429) • AWS Telemetry Active";
-      apiConnectionState.activationNotice = "OpenWeather API rate limit reached. Continuous AWS telemetry stream active.";
+      notice = "OpenWeather API limit reached (HTTP 429).";
+      apiConnectionState.statusText = "Rate Limit Reached (429) • Using Backup Weather";
+      apiConnectionState.activationNotice = "OpenWeather free rate limit reached. Using backup weather stream.";
       console.log("[WeatherGuard Telemetry] OpenWeather rate limit reached (HTTP 429). Continuous AWS baseline active.");
     } else {
-      notice = `OpenWeather API returned HTTP status ${res.status}.`;
-      apiConnectionState.statusText = `OpenWeather HTTP ${res.status} • AWS Telemetry Active`;
+      notice = `OpenWeather returned status ${res.status}.`;
+      apiConnectionState.statusText = `OpenWeather Status ${res.status} • Using Backup Weather`;
       console.log(`[WeatherGuard Telemetry] OpenWeather HTTP ${res.status}. Continuous AWS baseline active.`);
     }
 
@@ -354,7 +354,7 @@ export async function fetchLiveWeatherFromApi(): Promise<{
       success: true,
       record: fallback,
       isSimulatedFallback: true,
-      message: `${notice} Continuous high-fidelity AWS baseline telemetry recorded.`,
+      message: `${notice} Backup weather data recorded.`,
     };
   } catch (err: any) {
     // Network or abort error

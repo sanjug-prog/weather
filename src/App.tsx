@@ -89,16 +89,16 @@ export default function App() {
       const res = await fetch("/api/collect", { method: "POST" });
       const data = await res.json();
       if (res.ok) {
-        setBannerMessage(`Telemetry ingested: ${data.message}`);
+        setBannerMessage(`New weather reading saved!`);
         await fetchDashboardData();
       } else {
-        setBannerMessage(`Ingest notice: ${data.message}`);
+        setBannerMessage(`Notice: ${data.message}`);
       }
     } catch (err: any) {
-      setBannerMessage(`Ingest error: ${err.message}`);
+      setBannerMessage(`Error: ${err.message}`);
     } finally {
       setIsRefreshing(false);
-      setTimeout(() => setBannerMessage(null), 5000);
+      setTimeout(() => setBannerMessage(null), 4000);
     }
   };
 
@@ -112,8 +112,8 @@ export default function App() {
       });
       if (res.ok) {
         await fetchDashboardData();
-        setBannerMessage(`Simulated anomaly (${type}) injected into CSV. Isolation Forest evaluated!`);
-        setTimeout(() => setBannerMessage(null), 6000);
+        setBannerMessage(`Test weather reading saved. AI checked the data!`);
+        setTimeout(() => setBannerMessage(null), 5000);
       }
     } catch (err: any) {
       console.error(err);
@@ -149,7 +149,7 @@ export default function App() {
   };
 
   return (
-    <div id="weatherguard-app-root" className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+    <div id="weatherguard-app-root" className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Header Bar */}
       <Header
         status={status}
@@ -164,13 +164,13 @@ export default function App() {
       {bannerMessage && (
         <div
           id="system-notification-banner"
-          className="bg-blue-600/90 text-white text-xs font-mono py-2 px-4 text-center border-b border-blue-500 shadow-md animate-fade-in"
+          className="bg-blue-600 text-white text-xs font-medium py-2 px-4 text-center border-b border-blue-700 shadow-sm animate-fade-in"
         >
           {bannerMessage}
         </div>
       )}
 
-      {/* Main Industrial Dashboard Content Area */}
+      {/* Main Dashboard Content Area */}
       <main id="main-dashboard-canvas" className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-5">
         {/* Section 1: Live Status Bar */}
         <LiveStatusBar status={status} lastUpdated={currentReading?.timestamp || status?.last_updated || null} />
@@ -182,25 +182,25 @@ export default function App() {
           anomalyCount={anomalies.length}
         />
 
-        {/* Section 3: Current Weather Telemetry Cards */}
+        {/* Section 3: Current Weather Cards */}
         <WeatherMetricsGrid reading={currentReading} />
 
-        {/* Section 4: Real-time Telemetry Graphs */}
+        {/* Section 4: Weather Graphs Over Time */}
         <TelemetryCharts history={history} />
 
-        {/* Section 5: Sensor Analytical Health Scores */}
+        {/* Section 5: Sensor Health Scores */}
         <SensorHealthGrid healthData={healthData} />
       </main>
 
       {/* Footer */}
-      <footer id="dashboard-footer" className="border-t border-slate-900 bg-slate-950 py-4 px-6 text-xs text-slate-500 font-mono">
+      <footer id="dashboard-footer" className="border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div>
-            <span>WEATHERGUARD AI</span> • Automatic Weather Station Intelligent Telemetry Protection
+          <div className="text-slate-700 font-medium">
+            <span className="font-bold text-slate-900">WeatherGuard AI</span> • Weather Station Smart Monitor & Problem Detector
           </div>
-          <div className="flex items-center gap-4 text-slate-400">
-            <span>Storage: CSV File (data/weather_data.csv)</span>
-            <span>ML: Isolation Forest (Contamination 0.08)</span>
+          <div className="flex items-center gap-4 text-slate-600">
+            <span>Saved to: <code className="bg-slate-100 px-1 py-0.5 rounded text-slate-800">weather_data.csv</code></span>
+            <span>AI: Pattern Anomaly Detector</span>
           </div>
         </div>
       </footer>
