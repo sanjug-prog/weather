@@ -18,7 +18,11 @@ export const LiveStatusBar: React.FC<LiveStatusBarProps> = ({ status, lastUpdate
         <div
           id="status-icon-api"
           className={`p-2 rounded-md ${
-            status?.api_connected ? "bg-emerald-500/10 text-emerald-400" : "bg-blue-500/10 text-blue-400"
+            status?.api_connected
+              ? "bg-emerald-500/10 text-emerald-400"
+              : status?.api_status_code === 401
+              ? "bg-amber-500/10 text-amber-400"
+              : "bg-blue-500/10 text-blue-400"
           }`}
         >
           <Wifi className="w-4 h-4" />
@@ -32,16 +36,30 @@ export const LiveStatusBar: React.FC<LiveStatusBarProps> = ({ status, lastUpdate
               className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                 status?.api_connected
                   ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  : status?.api_status_code === 401
+                  ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                  : status?.api_status_code === 429
+                  ? "bg-orange-500/15 text-orange-300 border border-orange-500/30"
                   : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
               }`}
             >
-              {status?.api_connected ? "LIVE 200 OK" : "ACTIVE STREAM"}
+              {status?.api_connected
+                ? "LIVE 200 OK"
+                : status?.api_status_code === 401
+                ? "ACTIVATING (401)"
+                : status?.api_status_code === 429
+                ? "RATE LIMIT (429)"
+                : "BASELINE ACTIVE"}
             </span>
           </div>
-          <div id="status-val-api" className="text-sm font-semibold text-white mt-1 truncate">
+          <div id="status-val-api" className="text-sm font-semibold text-white mt-1 truncate" title={status?.api_status_text}>
             {status?.api_status_text || "Checking OpenWeather..."}
           </div>
-          <p className="text-[11px] text-slate-500 mt-0.5">OpenWeather API v2.5 Ingestion</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">
+            {status?.api_status_code === 401
+              ? "Propagating on OpenWeather • AWS Baseline Active"
+              : "OpenWeather API v2.5 Telemetry"}
+          </p>
         </div>
       </div>
 

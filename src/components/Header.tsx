@@ -55,6 +55,19 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </div>
 
+          {/* Key Activating Alert Pill if 401 */}
+          {status?.api_status_code === 401 && (
+            <button
+              id="header-key-activating-pill"
+              onClick={onOpenConfig}
+              title="OpenWeather key is propagating across servers. High-fidelity AWS baseline stream active. Click to test or configure."
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition cursor-pointer"
+            >
+              <Radio className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <span>Key Activating (401)</span>
+            </button>
+          )}
+
           {/* Action Buttons */}
           <button
             id="btn-collect-telemetry"

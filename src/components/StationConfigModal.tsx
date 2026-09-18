@@ -23,9 +23,52 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
   const [intervalSec, setIntervalSec] = useState<string>(status?.collection_interval_sec.toString() || "60");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [isTesting, setIsTesting] = useState<boolean>(false);
+  const [testResult, setTestResult] = useState<{ valid: boolean; status: number; message: string } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const handleTestKey = async () => {
+    setIsTesting(true);
+    setTestResult(null);
+    try {
+      const res = await fetch("/api/verify-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: apiKey.trim() || undefined,
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+        }),
+      });
+      const data = await res.json();
+      setTestResult(data);
+    } catch (err: any) {
+      setTestResult({ valid: false, status: 0, message: `Verification error: ${err.message}` });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const handleClearKey = async () => {
+    setApiKey("");
+    setTestResult(null);
+    setIsSaving(true);
+    try {
+      await onSaveConfig({
+        apiKey: "",
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        collectionIntervalSec: parseInt(intervalSec, 10),
+      });
+      setMessage("API key cleared. Reverted to continuous high-fidelity AWS telemetry baseline.");
+    } catch (err: any) {
+      setMessage(`Error: ${err.message}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,23 +146,90 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
 
           {/* OpenWeather API Key */}
           <div>
-            <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5 mb-1.5">
-              <Key className="w-3.5 h-3.5 text-blue-400" />
-              <span>OpenWeather API Key:</span>
-            </label>
-            <input
-              type="text"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Paste 32-character key (optional, leave blank to use active baseline)"
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
-            />
-            <p className="text-[11px] text-slate-500 mt-1">
-              Current API status:{" "}
-              <strong className={status?.api_connected ? "text-emerald-400" : "text-amber-400"}>
-                {status?.api_status_text}
-              </strong>
-            </p>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-mono font-semibold text-slate-300 uppercase flex items-center gap-1.5">
+                <Key className="w-3.5 h-3.5 text-blue-400" />
+                <span>OpenWeather API Key:</span>
+              </label>
+              {status?.api_has_key && (
+                <button
+                  type="button"
+                  onClick={handleClearKey}
+                  disabled={isSaving}
+                  className="text-[11px] font-mono text-slate-400 hover:text-rose-400 transition underline cursor-pointer"
+                >
+                  Clear Key
+                </button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={apiKey}
+                onChange={(e) => {
+                  setApiKey(e.target.value);
+                  setTestResult(null);
+                }}
+                placeholder={
+                  status?.api_has_key
+                    ? `Current Key: ${status.api_key_masked || "Configured"} (paste new key to update)`
+                    : "Paste 32-character key (optional, leave blank to use baseline)"
+                }
+                className="flex-1 bg-slate-950 border border-slate-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="button"
+                onClick={handleTestKey}
+                disabled={isTesting}
+                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded text-xs font-mono font-medium transition whitespace-nowrap cursor-pointer disabled:opacity-50"
+              >
+                {isTesting ? "Testing..." : "Test Key"}
+              </button>
+            </div>
+
+            {/* Test Result Feedback */}
+            {testResult && (
+              <div
+                className={`mt-2 p-2.5 rounded text-xs font-mono border ${
+                  testResult.valid
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                    : testResult.status === 401
+                    ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                    : "bg-rose-500/10 border-rose-500/30 text-rose-300"
+                }`}
+              >
+                <div className="font-semibold flex items-center gap-1.5">
+                  <span>Status: HTTP {testResult.status}</span>
+                  <span>{testResult.valid ? "• Live & Operational" : "• Activation Notice"}</span>
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-slate-300">{testResult.message}</p>
+              </div>
+            )}
+
+            <div className="mt-1.5 text-[11px] text-slate-400 flex items-center justify-between">
+              <span>
+                Current Feed:{" "}
+                <strong
+                  className={
+                    status?.api_connected
+                      ? "text-emerald-400"
+                      : status?.api_status_code === 401
+                      ? "text-amber-400"
+                      : "text-blue-400"
+                  }
+                >
+                  {status?.api_status_text}
+                </strong>
+              </span>
+            </div>
+
+            {status?.api_status_code === 401 && !testResult && (
+              <div className="mt-2 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded text-amber-200 text-[11px] font-mono leading-relaxed">
+                <span className="font-bold text-amber-300">OpenWeather Notice: </span>
+                New OpenWeather API keys take 10–60 minutes (up to 2 hours) to propagate across OpenWeather's API gateways.
+                WeatherGuard AI automatically generates and logs continuous high-fidelity AWS observations so the dashboard, charts, and Isolation Forest ML detection run uninterrupted.
+              </div>
+            )}
           </div>
 
           {/* Coordinates */}

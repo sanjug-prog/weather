@@ -8,6 +8,8 @@ import {
   appendRecordToCsv,
   fetchLiveWeatherFromApi,
   stationConfig,
+  apiConnectionState,
+  verifyApiKey,
   CSV_PATH,
   formatTimestamp,
   ensureCsvExists,
@@ -46,7 +48,7 @@ function startBackgroundCollection() {
       const records = readAllRecords();
       detector.train(records);
     } catch (err: any) {
-      console.error("[Collector Loop Error]:", err.message);
+      console.warn("[WeatherGuard AI Collection Notice]:", err.message);
     }
   }, intervalMs);
 }
@@ -66,18 +68,15 @@ fetchLiveWeatherFromApi().then(() => {
  */
 app.get("/api/status", (req, res) => {
   const records = readAllRecords();
-  const apiConfigured = Boolean(
-    stationConfig.apiKey &&
-    stationConfig.apiKey.trim() !== "" &&
-    stationConfig.apiKey !== "MY_OPENWEATHER_KEY"
-  );
 
   res.json({
     status: "operational",
-    api_connected: apiConfigured,
-    api_status_text: apiConfigured
-      ? "Connected (OpenWeather Live)"
-      : "Active (Telemetry Baseline Generator / Awaiting Key)",
+    api_connected: apiConnectionState.connected,
+    api_status_code: apiConnectionState.statusCode,
+    api_status_text: apiConnectionState.statusText,
+    api_has_key: apiConnectionState.hasKey,
+    api_key_masked: apiConnectionState.keyMasked,
+    activation_notice: apiConnectionState.activationNotice || null,
     data_collection_active: true,
     collection_interval_sec: stationConfig.collectionIntervalSec,
     ml_model_status:
@@ -270,7 +269,7 @@ app.post("/api/simulate-anomaly", (req, res) => {
  * POST /api/config
  * Update API Key, coordinates, or interval live
  */
-app.post("/api/config", (req, res) => {
+app.post("/api/config", async (req, res) => {
   const { apiKey, latitude, longitude, collectionIntervalSec } = req.body;
   if (apiKey !== undefined) stationConfig.apiKey = apiKey.trim();
   if (latitude !== undefined) stationConfig.latitude = parseFloat(latitude);
@@ -280,9 +279,17 @@ app.post("/api/config", (req, res) => {
     startBackgroundCollection();
   }
 
+  // Immediately test and run ingestion cycle with the updated configuration
+  const result = await fetchLiveWeatherFromApi();
+  const records = readAllRecords();
+  detector.train(records);
+
   res.json({
     status: "success",
-    message: "Updated AWS station configuration.",
+    message: result.message || "Updated AWS station configuration.",
+    api_connected: apiConnectionState.connected,
+    api_status_code: apiConnectionState.statusCode,
+    api_status_text: apiConnectionState.statusText,
     config: {
       hasApiKey: Boolean(stationConfig.apiKey && stationConfig.apiKey.length > 0),
       latitude: stationConfig.latitude,
@@ -290,6 +297,20 @@ app.post("/api/config", (req, res) => {
       collectionIntervalSec: stationConfig.collectionIntervalSec,
     },
   });
+});
+
+/**
+ * POST /api/verify-key
+ * Test an OpenWeather API key directly and return connection diagnostic feedback
+ */
+app.post("/api/verify-key", async (req, res) => {
+  const { apiKey, latitude, longitude } = req.body;
+  const keyToTest = apiKey !== undefined ? apiKey : stationConfig.apiKey;
+  const lat = latitude !== undefined ? parseFloat(latitude) : stationConfig.latitude;
+  const lon = longitude !== undefined ? parseFloat(longitude) : stationConfig.longitude;
+
+  const verification = await verifyApiKey(keyToTest, lat, lon);
+  res.json(verification);
 });
 
 /**

@@ -62,7 +62,11 @@ export interface SensorHealthData {
 export interface StationStatus {
   status: string;
   api_connected: boolean;
+  api_status_code?: number | null;
   api_status_text: string;
+  api_has_key?: boolean;
+  api_key_masked?: string;
+  activation_notice?: string | null;
   data_collection_active: boolean;
   collection_interval_sec: number;
   ml_model_status: string;
