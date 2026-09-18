@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, FileSpreadsheet, Download, RefreshCw } from "lucide-react";
+import { DashboardDataSource } from "../services/dashboardDataSource";
 
 interface RawCsvViewerModalProps {
   isOpen: boolean;
@@ -13,11 +14,8 @@ export const RawCsvViewerModal: React.FC<RawCsvViewerModalProps> = ({ isOpen, on
   const fetchCsv = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/raw-csv");
-      if (res.ok) {
-        const text = await res.text();
-        setCsvText(text);
-      }
+      const text = await DashboardDataSource.getRawCsv();
+      setCsvText(text);
     } catch (err) {
       console.error(err);
     } finally {

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { X, Settings, Check, Key, Globe, Clock, RotateCcw } from "lucide-react";
 import { StationStatus } from "../types";
+import { DashboardDataSource } from "../services/dashboardDataSource";
 
 interface StationConfigModalProps {
   isOpen: boolean;
@@ -33,16 +34,11 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
     setIsTesting(true);
     setTestResult(null);
     try {
-      const res = await fetch("/api/verify-key", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          apiKey: apiKey.trim() || undefined,
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude),
-        }),
-      });
-      const data = await res.json();
+      const data = await DashboardDataSource.verifyKey(
+        apiKey.trim() || undefined,
+        parseFloat(latitude),
+        parseFloat(longitude)
+      );
       setTestResult(data);
     } catch (err: any) {
       setTestResult({ valid: false, status: 0, message: `Verification error: ${err.message}` });

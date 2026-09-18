@@ -2,7 +2,14 @@ import fs from "fs";
 import path from "path";
 import { WeatherRecord } from "./types.js";
 
-export const CSV_PATH = path.join(process.cwd(), "data", "weather_data.csv");
+function getCsvPath(): string {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join("/tmp", "weather_data.csv");
+  }
+  return path.join(process.cwd(), "data", "weather_data.csv");
+}
+
+export const CSV_PATH = getCsvPath();
 
 export const CSV_HEADERS = [
   "timestamp",
@@ -56,10 +63,24 @@ export const apiConnectionState: ApiConnectionState = {
 export function ensureCsvExists(): void {
   const dir = path.dirname(CSV_PATH);
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch {
+      // ignore
+    }
   }
 
   if (!fs.existsSync(CSV_PATH) || fs.statSync(CSV_PATH).size === 0) {
+    const originalPath = path.join(process.cwd(), "data", "weather_data.csv");
+    if (fs.existsSync(originalPath) && originalPath !== CSV_PATH) {
+      try {
+        fs.copyFileSync(originalPath, CSV_PATH);
+        console.log(`[CSV] Seeded ${CSV_PATH} from ${originalPath}.`);
+        return;
+      } catch {
+        // fallback to headers
+      }
+    }
     fs.writeFileSync(CSV_PATH, CSV_HEADERS.join(",") + "\n", "utf8");
     console.log(`[CSV] Initialized ${CSV_PATH} with standard AWS headers.`);
   }

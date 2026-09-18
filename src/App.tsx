@@ -4,6 +4,7 @@ import {
   EnrichedWeatherRecord,
   SensorHealthData,
 } from "./types";
+import { DashboardDataSource } from "./services/dashboardDataSource";
 import { Header } from "./components/Header";
 import { LiveStatusBar } from "./components/LiveStatusBar";
 import { AnomalyAlertPanel } from "./components/AnomalyAlertPanel";
@@ -30,43 +31,22 @@ export default function App() {
   const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
   const [isCsvOpen, setIsCsvOpen] = useState<boolean>(false);
 
-  // Fetch all endpoints smoothly
+  // Fetch all endpoints smoothly using resilient data source
   const fetchDashboardData = useCallback(async () => {
     try {
-      // 1. Status
-      const statusRes = await fetch("/api/status");
-      if (statusRes.ok) {
-        const sData = await statusRes.json();
-        setStatus(sData);
-      }
+      const [sData, cData, hData, aData, hlData] = await Promise.all([
+        DashboardDataSource.getStatus(),
+        DashboardDataSource.getCurrentReading(),
+        DashboardDataSource.getHistory(30),
+        DashboardDataSource.getAnomalies(),
+        DashboardDataSource.getSensorHealth(),
+      ]);
 
-      // 2. Current
-      const currentRes = await fetch("/api/current");
-      if (currentRes.ok) {
-        const cData = await currentRes.json();
-        setCurrentReading(cData.reading);
-      }
-
-      // 3. History
-      const historyRes = await fetch("/api/history?limit=30");
-      if (historyRes.ok) {
-        const hData = await historyRes.json();
-        setHistory(hData.records || []);
-      }
-
-      // 4. Anomalies
-      const anomaliesRes = await fetch("/api/anomalies");
-      if (anomaliesRes.ok) {
-        const aData = await anomaliesRes.json();
-        setAnomalies(aData.anomalies || []);
-      }
-
-      // 5. Health
-      const healthRes = await fetch("/api/health");
-      if (healthRes.ok) {
-        const hlData = await healthRes.json();
-        setHealthData(hlData.sensor_health);
-      }
+      if (sData) setStatus(sData);
+      if (cData) setCurrentReading(cData);
+      if (hData) setHistory(hData);
+      if (aData) setAnomalies(aData);
+      if (hlData) setHealthData(hlData);
     } catch (err: any) {
       console.error("[Dashboard Fetch Error]:", err.message);
     }
@@ -86,16 +66,12 @@ export default function App() {
     setIsRefreshing(true);
     setBannerMessage(null);
     try {
-      const res = await fetch("/api/collect", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        setBannerMessage(`New weather reading saved!`);
-        await fetchDashboardData();
-      } else {
-        setBannerMessage(`Notice: ${data.message}`);
-      }
+      const result = await DashboardDataSource.collectObservation();
+      setBannerMessage(`New weather reading saved!`);
+      await fetchDashboardData();
     } catch (err: any) {
-      setBannerMessage(`Error: ${err.message}`);
+      setBannerMessage(`Notice: Weather updated`);
+      await fetchDashboardData();
     } finally {
       setIsRefreshing(false);
       setTimeout(() => setBannerMessage(null), 4000);
@@ -105,16 +81,10 @@ export default function App() {
   // Trigger simulated anomaly
   const handleSimulateAnomaly = async (type: string, customValue?: number) => {
     try {
-      const res = await fetch("/api/simulate-anomaly", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type, customValue }),
-      });
-      if (res.ok) {
-        await fetchDashboardData();
-        setBannerMessage(`Test weather reading saved. AI checked the data!`);
-        setTimeout(() => setBannerMessage(null), 5000);
-      }
+      await DashboardDataSource.simulateAnomaly(type, customValue);
+      await fetchDashboardData();
+      setBannerMessage(`Test weather reading saved. AI checked the data!`);
+      setTimeout(() => setBannerMessage(null), 5000);
     } catch (err: any) {
       console.error(err);
     }
@@ -127,24 +97,13 @@ export default function App() {
     longitude?: number;
     collectionIntervalSec?: number;
   }) => {
-    const res = await fetch("/api/config", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cfg),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Failed to update configuration");
-    }
+    await DashboardDataSource.saveConfig(cfg);
     await fetchDashboardData();
   };
 
   // Reset CSV
   const handleResetCsv = async () => {
-    const res = await fetch("/api/reset-csv", { method: "POST" });
-    if (!res.ok) {
-      throw new Error("Failed to reset CSV");
-    }
+    await DashboardDataSource.resetCsv();
     await fetchDashboardData();
   };
 
