@@ -148,8 +148,8 @@ export const DashboardDataSource = {
     }
 
     try {
-      const lat = latitude || 13.0827;
-      const lon = longitude || 80.2707;
+      const lat = latitude || 11.2722;
+      const lon = longitude || 77.6040;
       const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey.trim()}&units=metric`);
       if (res.ok) {
         return {

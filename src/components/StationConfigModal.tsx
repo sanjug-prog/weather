@@ -19,8 +19,8 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
   onResetCsv,
 }) => {
   const [apiKey, setApiKey] = useState<string>("");
-  const [latitude, setLatitude] = useState<string>(status?.station_coordinates.latitude.toString() || "13.0827");
-  const [longitude, setLongitude] = useState<string>(status?.station_coordinates.longitude.toString() || "80.2707");
+  const [latitude, setLatitude] = useState<string>(status?.station_coordinates.latitude.toString() || "11.2722");
+  const [longitude, setLongitude] = useState<string>(status?.station_coordinates.longitude.toString() || "77.6040");
   const [intervalSec, setIntervalSec] = useState<string>(status?.collection_interval_sec.toString() || "60");
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isResetting, setIsResetting] = useState<boolean>(false);
@@ -258,6 +258,10 @@ export const StationConfigModal: React.FC<StationConfigModalProps> = ({
               />
             </div>
           </div>
+
+          <p className="text-[11px] text-slate-500 font-medium">
+            GPS Coordinates: <span className="text-slate-700 font-semibold font-mono">11° 16' 19.8" N, 77° 36' 14.4" E</span> ({parseFloat(latitude || "0").toFixed(4)}°N, {parseFloat(longitude || "0").toFixed(4)}°E)
+          </p>
 
           {/* Collection Interval */}
           <div>

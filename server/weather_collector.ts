@@ -44,10 +44,32 @@ export interface ApiConnectionState {
   activationNotice?: string;
 }
 
+function parseStationLat(): number {
+  const envLat = process.env.LATITUDE;
+  if (!envLat) return 11.2722;
+  const val = parseFloat(envLat);
+  // Migrate previous default coordinates (Delhi 28.6139 or Chennai 13.0827)
+  if (Math.abs(val - 28.6139) < 0.005 || Math.abs(val - 13.0827) < 0.005) {
+    return 11.2722;
+  }
+  return isNaN(val) ? 11.2722 : val;
+}
+
+function parseStationLon(): number {
+  const envLon = process.env.LONGITUDE;
+  if (!envLon) return 77.6040;
+  const val = parseFloat(envLon);
+  // Migrate previous default coordinates (Delhi 77.2090 or Chennai 80.2707)
+  if (Math.abs(val - 77.2090) < 0.005 || Math.abs(val - 80.2707) < 0.005) {
+    return 77.6040;
+  }
+  return isNaN(val) ? 77.6040 : val;
+}
+
 export const stationConfig: StationConfig = {
   apiKey: process.env.OPENWEATHER_API_KEY || "",
-  latitude: parseFloat(process.env.LATITUDE || "13.0827"),
-  longitude: parseFloat(process.env.LONGITUDE || "80.2707"),
+  latitude: parseStationLat(),
+  longitude: parseStationLon(),
   collectionIntervalSec: parseInt(process.env.COLLECTION_INTERVAL || "60", 10),
 };
 
@@ -215,8 +237,8 @@ export function formatTimestamp(date: Date = new Date()): string {
 
 export async function verifyApiKey(
   key: string,
-  lat: number = 13.0827,
-  lon: number = 80.2707
+  lat: number = 11.2722,
+  lon: number = 77.6040
 ): Promise<{
   valid: boolean;
   status: number;

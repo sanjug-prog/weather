@@ -19,27 +19,27 @@ export interface ClientConfig {
 
 const DEFAULT_CONFIG: ClientConfig = {
   apiKey: "",
-  latitude: 13.0827,
-  longitude: 80.2707,
+  latitude: 11.2722,
+  longitude: 77.6040,
   collectionIntervalSec: 60,
 };
 
 const BASELINE_RECORDS: WeatherRecord[] = [
-  { timestamp: "2026-09-18 05:00:00", latitude: 13.0827, longitude: 80.2707, temperature: 27.2, feels_like: 30.1, pressure: 1010.2, humidity: 82, wind_speed: 3.1, wind_direction: 210, cloudiness: 40, rainfall: 0.0, visibility: 9000, weather_condition: "Clear" },
-  { timestamp: "2026-09-18 05:15:00", latitude: 13.0827, longitude: 80.2707, temperature: 27.4, feels_like: 30.4, pressure: 1010.1, humidity: 81, wind_speed: 3.2, wind_direction: 215, cloudiness: 42, rainfall: 0.0, visibility: 9200, weather_condition: "Clear" },
-  { timestamp: "2026-09-18 05:30:00", latitude: 13.0827, longitude: 80.2707, temperature: 27.6, feels_like: 30.8, pressure: 1009.9, humidity: 80, wind_speed: 3.4, wind_direction: 220, cloudiness: 45, rainfall: 0.0, visibility: 9500, weather_condition: "Clear" },
-  { timestamp: "2026-09-18 05:45:00", latitude: 13.0827, longitude: 80.2707, temperature: 27.9, feels_like: 31.2, pressure: 1009.8, humidity: 79, wind_speed: 3.6, wind_direction: 225, cloudiness: 48, rainfall: 0.0, visibility: 10000, weather_condition: "Clear" },
-  { timestamp: "2026-09-18 06:00:00", latitude: 13.0827, longitude: 80.2707, temperature: 28.3, feels_like: 31.8, pressure: 1009.7, humidity: 78, wind_speed: 3.8, wind_direction: 230, cloudiness: 50, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 06:15:00", latitude: 13.0827, longitude: 80.2707, temperature: 28.7, feels_like: 32.4, pressure: 1009.5, humidity: 76, wind_speed: 4.0, wind_direction: 232, cloudiness: 52, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 06:30:00", latitude: 13.0827, longitude: 80.2707, temperature: 29.1, feels_like: 33.0, pressure: 1009.3, humidity: 75, wind_speed: 4.1, wind_direction: 235, cloudiness: 55, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 06:45:00", latitude: 13.0827, longitude: 80.2707, temperature: 29.6, feels_like: 33.7, pressure: 1009.1, humidity: 74, wind_speed: 4.2, wind_direction: 238, cloudiness: 58, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 07:00:00", latitude: 13.0827, longitude: 80.2707, temperature: 30.0, feels_like: 34.3, pressure: 1009.0, humidity: 73, wind_speed: 4.3, wind_direction: 240, cloudiness: 60, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 07:15:00", latitude: 13.0827, longitude: 80.2707, temperature: 30.5, feels_like: 35.0, pressure: 1008.8, humidity: 72, wind_speed: 4.5, wind_direction: 242, cloudiness: 62, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 07:30:00", latitude: 13.0827, longitude: 80.2707, temperature: 30.9, feels_like: 35.5, pressure: 1008.6, humidity: 71, wind_speed: 4.4, wind_direction: 244, cloudiness: 63, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 07:45:00", latitude: 13.0827, longitude: 80.2707, temperature: 31.2, feels_like: 35.9, pressure: 1008.3, humidity: 70, wind_speed: 4.6, wind_direction: 245, cloudiness: 65, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 08:00:00", latitude: 13.0827, longitude: 80.2707, temperature: 31.5, feels_like: 36.2, pressure: 1008.1, humidity: 69, wind_speed: 4.7, wind_direction: 248, cloudiness: 66, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 08:15:00", latitude: 13.0827, longitude: 80.2707, temperature: 31.8, feels_like: 36.6, pressure: 1008.0, humidity: 68, wind_speed: 4.8, wind_direction: 250, cloudiness: 68, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
-  { timestamp: "2026-09-18 08:30:00", latitude: 13.0827, longitude: 80.2707, temperature: 32.1, feels_like: 37.0, pressure: 1007.8, humidity: 67, wind_speed: 5.0, wind_direction: 252, cloudiness: 70, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 05:00:00", latitude: 11.2722, longitude: 77.6040, temperature: 27.2, feels_like: 30.1, pressure: 1010.2, humidity: 82, wind_speed: 3.1, wind_direction: 210, cloudiness: 40, rainfall: 0.0, visibility: 9000, weather_condition: "Clear" },
+  { timestamp: "2026-09-18 05:15:00", latitude: 11.2722, longitude: 77.6040, temperature: 27.4, feels_like: 30.4, pressure: 1010.1, humidity: 81, wind_speed: 3.2, wind_direction: 215, cloudiness: 42, rainfall: 0.0, visibility: 9200, weather_condition: "Clear" },
+  { timestamp: "2026-09-18 05:30:00", latitude: 11.2722, longitude: 77.6040, temperature: 27.6, feels_like: 30.8, pressure: 1009.9, humidity: 80, wind_speed: 3.4, wind_direction: 220, cloudiness: 45, rainfall: 0.0, visibility: 9500, weather_condition: "Clear" },
+  { timestamp: "2026-09-18 05:45:00", latitude: 11.2722, longitude: 77.6040, temperature: 27.9, feels_like: 31.2, pressure: 1009.8, humidity: 79, wind_speed: 3.6, wind_direction: 225, cloudiness: 48, rainfall: 0.0, visibility: 10000, weather_condition: "Clear" },
+  { timestamp: "2026-09-18 06:00:00", latitude: 11.2722, longitude: 77.6040, temperature: 28.3, feels_like: 31.8, pressure: 1009.7, humidity: 78, wind_speed: 3.8, wind_direction: 230, cloudiness: 50, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 06:15:00", latitude: 11.2722, longitude: 77.6040, temperature: 28.7, feels_like: 32.4, pressure: 1009.5, humidity: 76, wind_speed: 4.0, wind_direction: 232, cloudiness: 52, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 06:30:00", latitude: 11.2722, longitude: 77.6040, temperature: 29.1, feels_like: 33.0, pressure: 1009.3, humidity: 75, wind_speed: 4.1, wind_direction: 235, cloudiness: 55, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 06:45:00", latitude: 11.2722, longitude: 77.6040, temperature: 29.6, feels_like: 33.7, pressure: 1009.1, humidity: 74, wind_speed: 4.2, wind_direction: 238, cloudiness: 58, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 07:00:00", latitude: 11.2722, longitude: 77.6040, temperature: 30.0, feels_like: 34.3, pressure: 1009.0, humidity: 73, wind_speed: 4.3, wind_direction: 240, cloudiness: 60, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 07:15:00", latitude: 11.2722, longitude: 77.6040, temperature: 30.5, feels_like: 35.0, pressure: 1008.8, humidity: 72, wind_speed: 4.5, wind_direction: 242, cloudiness: 62, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 07:30:00", latitude: 11.2722, longitude: 77.6040, temperature: 30.9, feels_like: 35.5, pressure: 1008.6, humidity: 71, wind_speed: 4.4, wind_direction: 244, cloudiness: 63, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 07:45:00", latitude: 11.2722, longitude: 77.6040, temperature: 31.2, feels_like: 35.9, pressure: 1008.3, humidity: 70, wind_speed: 4.6, wind_direction: 245, cloudiness: 65, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 08:00:00", latitude: 11.2722, longitude: 77.6040, temperature: 31.5, feels_like: 36.2, pressure: 1008.1, humidity: 69, wind_speed: 4.7, wind_direction: 248, cloudiness: 66, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 08:15:00", latitude: 11.2722, longitude: 77.6040, temperature: 31.8, feels_like: 36.6, pressure: 1008.0, humidity: 68, wind_speed: 4.8, wind_direction: 250, cloudiness: 68, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
+  { timestamp: "2026-09-18 08:30:00", latitude: 11.2722, longitude: 77.6040, temperature: 32.1, feels_like: 37.0, pressure: 1007.8, humidity: 67, wind_speed: 5.0, wind_direction: 252, cloudiness: 70, rainfall: 0.0, visibility: 10000, weather_condition: "Clouds" },
 ];
 
 function getStoredRecords(): WeatherRecord[] {
@@ -48,7 +48,12 @@ function getStoredRecords(): WeatherRecord[] {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        // Automatically sync coordinates to the new station location
+        return parsed.map((r: WeatherRecord) => ({
+          ...r,
+          latitude: DEFAULT_CONFIG.latitude,
+          longitude: DEFAULT_CONFIG.longitude,
+        }));
       }
     }
   } catch (e) {
@@ -69,7 +74,16 @@ export function getClientConfig(): ClientConfig {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
     if (raw) {
-      return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+      const cfg = { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+      // Migrate previous default coordinates if present
+      if (Math.abs(cfg.latitude - 13.0827) < 0.01 || Math.abs(cfg.latitude - 28.6139) < 0.01) {
+        cfg.latitude = DEFAULT_CONFIG.latitude;
+        cfg.longitude = DEFAULT_CONFIG.longitude;
+        try {
+          localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(cfg));
+        } catch {}
+      }
+      return cfg;
     }
   } catch (e) {
     console.warn("Could not read config from localStorage", e);

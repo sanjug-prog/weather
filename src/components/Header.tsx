@@ -45,7 +45,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Action Controls & Telemetry Meta */}
         <div id="header-controls-block" className="flex flex-wrap items-center gap-2.5 text-xs">
           {/* Station location badge */}
-          <div id="header-station-location" className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 font-medium">
+          <div
+            id="header-station-location"
+            title={`Station Location: 11° 16' 19.8" N, 77° 36' 14.4" E (${status?.station_coordinates.latitude.toFixed(4)}°N, ${status?.station_coordinates.longitude.toFixed(4)}°E)`}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-100 border border-slate-200 text-slate-700 font-medium cursor-help"
+          >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
