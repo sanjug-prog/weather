@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WeatherGuard AI - AWS Anomaly Detection</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-logo">WG</div>
+        <div>
+          <h1>WEATHERGUARD AI</h1>
+          <p class="subtitle">AI/ML-Based Intelligent AWS Anomaly Detection</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="station-badge">
+          <span class="pulse-dot"></span>
+          <span id="station-coords">AWS Lat: 13.0827, Lon: 80.2707</span>
+        </div>
+        <div class="timestamp-badge" id="last-updated">Updating...</div>
+      </div>
+    </header>
+
+    <!-- LIVE STATUS BAR -->
+    <section class="status-bar">
+      <div class="status-item">
+        <span class="status-label">API Status</span>
+        <span class="status-value active" id="status-api">Connected</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Data Collection</span>
+        <span class="status-value active" id="status-collector">Active (60s loop)</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">ML Model Status</span>
+        <span class="status-value active" id="status-model">Isolation Forest</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Total Telemetry Records</span>
+        <span class="status-value" id="status-records">--</span>
+      </div>
+    </section>
+
+    <!-- ANOMALY ALERT BANNER -->
+    <section class="anomaly-section" id="anomaly-panel">
+      <div class="anomaly-card normal" id="anomaly-card">
+        <div class="anomaly-header">
+          <span class="anomaly-badge" id="anomaly-badge">NOMINAL TELEMETRY</span>
+          <span class="anomaly-time" id="anomaly-timestamp">--</span>
+        </div>
+        <div class="anomaly-body">
+          <div class="anomaly-param-block">
+            <span class="param-label">PARAMETER:</span>
+            <span class="param-value" id="anomaly-param">None</span>
+          </div>
+          <div class="anomaly-param-block">
+            <span class="param-label">CURRENT VALUE:</span>
+            <span class="param-value" id="anomaly-current">--</span>
+          </div>
+          <div class="anomaly-param-block">
+            <span class="param-label">SEVERITY:</span>
+            <span class="param-value" id="anomaly-severity">NORMAL</span>
+          </div>
+          <div class="anomaly-param-block">
+            <span class="param-label">ANOMALY SCORE:</span>
+            <span class="param-value" id="anomaly-score">0.00</span>
+          </div>
+        </div>
+        <p class="anomaly-reason" id="anomaly-reason">All AWS telemetry parameters within nominal operational limits.</p>
+      </div>
+    </section>
+
+    <!-- CURRENT WEATHER METRIC CARDS -->
+    <section class="metrics-grid">
+      <div class="card metric-card">
+        <span class="metric-title">Temperature</span>
+        <div class="metric-val" id="val-temp">-- <span class="unit">°C</span></div>
+        <span class="metric-sub" id="sub-feels">Feels like -- °C</span>
+      </div>
+      <div class="card metric-card">
+        <span class="metric-title">Humidity</span>
+        <div class="metric-val" id="val-humidity">-- <span class="unit">%</span></div>
+        <span class="metric-sub">Relative Humidity</span>
+      </div>
+      <div class="card metric-card">
+        <span class="metric-title">Barometric Pressure</span>
+        <div class="metric-val" id="val-pressure">-- <span class="unit">hPa</span></div>
+        <span class="metric-sub">Atmospheric</span>
+      </div>
+      <div class="card metric-card">
+        <span class="metric-title">Wind Speed</span>
+        <div class="metric-val" id="val-wind">-- <span class="unit">m/s</span></div>
+        <span class="metric-sub" id="sub-wind-dir">Direction: --°</span>
+      </div>
+      <div class="card metric-card">
+        <span class="metric-title">Rainfall</span>
+        <div class="metric-val" id="val-rain">-- <span class="unit">mm</span></div>
+        <span class="metric-sub">Accumulation</span>
+      </div>
+      <div class="card metric-card">
+        <span class="metric-title">Visibility</span>
+        <div class="metric-val" id="val-visibility">-- <span class="unit">m</span></div>
+        <span class="metric-sub" id="sub-condition">Condition: Clear</span>
+      </div>
+    </section>
+
+    <!-- REAL-TIME GRAPHS -->
+    <section class="charts-grid">
+      <div class="card chart-card">
+        <h3>Temperature vs Time</h3>
+        <canvas id="tempChart"></canvas>
+      </div>
+      <div class="card chart-card">
+        <h3>Humidity vs Time</h3>
+        <canvas id="humidityChart"></canvas>
+      </div>
+      <div class="card chart-card">
+        <h3>Pressure vs Time</h3>
+        <canvas id="pressureChart"></canvas>
+      </div>
+      <div class="card chart-card">
+        <h3>Wind Speed vs Time</h3>
+        <canvas id="windChart"></canvas>
+      </div>
+    </section>
+
+    <!-- SENSOR HEALTH SCORE PANEL -->
+    <section class="card health-section">
+      <div class="health-header">
+        <h3>Sensor Health Index</h3>
+        <p class="health-disclaimer">Notice: Analytical indicator and not a physical inspection of the sensors.</p>
+      </div>
+      <div class="health-grid" id="health-grid">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
