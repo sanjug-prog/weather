@@ -139,7 +139,9 @@ export const AnomalyAlertPanel: React.FC<AnomalyAlertPanelProps> = ({
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Unusualness Score
               </span>
-              <span className="text-[11px] font-medium text-slate-500">Alert at &gt; 0.58</span>
+              <span className="text-[11px] font-medium text-slate-500">
+                {isAnomaly ? "Threshold ≥ 0.55" : "Alert at ≥ 0.55"}
+              </span>
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className={`text-base font-bold ${currentReading.anomaly_score > 0.65 ? "text-rose-600" : "text-slate-900"}`}>
