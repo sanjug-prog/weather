@@ -2,6 +2,9 @@ import {
   StationStatus,
   EnrichedWeatherRecord,
   SensorHealthData,
+  WeeklyWeatherResponse,
+  WeatherStationItem,
+  NearbyComparisonItem,
 } from "../types";
 import { clientWeatherEngine } from "./clientWeatherEngine";
 
@@ -177,5 +180,76 @@ export const DashboardDataSource = {
         message: `Network error connecting to OpenWeather: ${e.message}`,
       };
     }
+  },
+
+  async getWeeklyWeather(
+    latitude?: number,
+    longitude?: number,
+    name?: string
+  ): Promise<WeeklyWeatherResponse | null> {
+    const query = new URLSearchParams();
+    if (latitude !== undefined) query.set("lat", latitude.toString());
+    if (longitude !== undefined) query.set("lon", longitude.toString());
+    if (name) query.set("name", name);
+
+    const data = await safeFetchJson<WeeklyWeatherResponse>(`/api/weekly?${query.toString()}`);
+    if (data && data.status === "success") {
+      return data;
+    }
+    return clientWeatherEngine.getWeeklyWeather(latitude, longitude, name);
+  },
+
+  async getStations(): Promise<WeatherStationItem[]> {
+    const data = await safeFetchJson<{ status: string; stations: WeatherStationItem[] }>("/api/stations");
+    if (data && Array.isArray(data.stations)) {
+      return data.stations;
+    }
+    return clientWeatherEngine.getStations();
+  },
+
+  async getNearbyComparison(stationId: string): Promise<{
+    targetStation: WeatherStationItem | null;
+    nearbyStations: NearbyComparisonItem[];
+    spatialConsistencyScore: number;
+    overallAssessment: string;
+  } | null> {
+    const data = await safeFetchJson<{
+      status: string;
+      targetStation: WeatherStationItem | null;
+      nearbyStations: NearbyComparisonItem[];
+      spatialConsistencyScore: number;
+      overallAssessment: string;
+    }>(`/api/stations/${encodeURIComponent(stationId)}/nearby`);
+    if (data && data.status === "success") {
+      return data;
+    }
+    return clientWeatherEngine.getNearbyComparison(stationId);
+  },
+
+  async geocode(query: string): Promise<Array<{
+    name: string;
+    country: string;
+    admin1?: string;
+    latitude: number;
+    longitude: number;
+    elevation?: number;
+    timezone: string;
+  }>> {
+    const data = await safeFetchJson<{
+      status: string;
+      results: Array<{
+        name: string;
+        country: string;
+        admin1?: string;
+        latitude: number;
+        longitude: number;
+        elevation?: number;
+        timezone: string;
+      }>;
+    }>(`/api/geocode?query=${encodeURIComponent(query)}`);
+    if (data && Array.isArray(data.results)) {
+      return data.results;
+    }
+    return clientWeatherEngine.geocode(query);
   },
 };

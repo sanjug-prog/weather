@@ -1,6 +1,6 @@
 {
   "name": "WeatherGuard AI",
-  "description": "AI/ML-Based Intelligent Anomaly Detection for Automatic Weather Stations (AWS) with real-time OpenWeather data ingestion, CSV persistence, and Isolation Forest ML analysis.",
+  "description": "AI/ML-Based Intelligent Anomaly Detection for Automatic Weather Stations (AWS) with real-time telemetry ingestion, 7-day historical observations & 7-day forecast analytics, and an interactive worldwide weather station map.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

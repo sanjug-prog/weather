@@ -16,6 +16,8 @@ import {
 } from "./server/weather_collector.js";
 import { IsolationForestDetector } from "./server/ml_detector.js";
 import { WeatherRecord } from "./server/types.js";
+import { fetchWeeklyWeatherData } from "./server/weekly_weather.js";
+import { getAllStations, getNearbyStationComparison, searchLocations } from "./server/station_registry.js";
 
 dotenv.config();
 
@@ -355,6 +357,86 @@ app.post("/api/reset-csv", (req, res) => {
   const records = readAllRecords();
   detector.train(records);
   res.json({ status: "success", message: "Reset weather_data.csv to nominal baseline records." });
+});
+
+/**
+ * GET /api/weekly
+ * Returns past 7 days actual observations, current conditions, and next 7 days forecast
+ */
+app.get(["/api/weekly", "/api/weather/weekly"], async (req, res) => {
+  try {
+    const lat = req.query.lat ? parseFloat(req.query.lat as string) : stationConfig.latitude;
+    const lon = req.query.lon ? parseFloat(req.query.lon as string) : stationConfig.longitude;
+    const name = (req.query.name as string) || undefined;
+
+    const data = await fetchWeeklyWeatherData(lat, lon, name);
+    res.json(data);
+  } catch (err: any) {
+    res.status(500).json({
+      status: "error",
+      message: `Failed to fetch weekly meteorological data: ${err.message}`,
+    });
+  }
+});
+
+/**
+ * GET /api/stations
+ * Returns verified real-world meteorological stations with observation data and anomaly status
+ */
+app.get("/api/stations", async (req, res) => {
+  try {
+    const stations = await getAllStations();
+    res.json({
+      status: "success",
+      count: stations.length,
+      stations,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: "error",
+      message: `Failed to retrieve weather stations: ${err.message}`,
+    });
+  }
+});
+
+/**
+ * GET /api/stations/:id/nearby
+ * Returns nearby station comparisons with spatial consistency anomaly evaluation
+ */
+app.get("/api/stations/:id/nearby", async (req, res) => {
+  try {
+    const comparison = await getNearbyStationComparison(req.params.id);
+    res.json({
+      status: "success",
+      ...comparison,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: "error",
+      message: `Failed to retrieve nearby station comparison: ${err.message}`,
+    });
+  }
+});
+
+/**
+ * GET /api/geocode
+ * Search cities or places worldwide with real coordinates
+ */
+app.get("/api/geocode", async (req, res) => {
+  try {
+    const query = ((req.query.query || req.query.q) as string) || "";
+    const results = await searchLocations(query);
+    res.json({
+      status: "success",
+      count: results.length,
+      results,
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: "error",
+      message: `Geocoding search failed: ${err.message}`,
+    });
+  }
 });
 
 // ======================= VITE & STATIC SERVING =======================
